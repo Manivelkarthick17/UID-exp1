@@ -1,0 +1,101 @@
+AIM:
+
+      To Create a weather application that displays the weather forecast for a specific location.
+
+DESCRIPTION:
+
+      This project is a React-based Weather Application that displays the current weather and forecast for a specific location. 
+      Users can enter a city or location, and the app fetches weather data using an API (such as OpenWeatherMap). The application uses 
+      React state management (useState) and effect hooks (useEffect) to handle user input and API responses. The interface displays 
+      key weather information like temperature, humidity, and weather conditions, updating dynamically based on the selected location. 
+      This project demonstrates API integration, dynamic rendering, and interactive user input in a React application
+
+CODE:
+
+      import React, { useState } from "react";
+      import axios from "axios";
+      
+      function App() {
+        const [city, setCity] = useState("");
+        const [weather, setWeather] = useState(null);
+        const [error, setError] = useState("");
+      
+        const apiKey = "YOUR_API_KEY"; // Replace with your OpenWeatherMap API key
+      
+        const getWeather = async () => {
+          if (!city) return;
+          try {
+            const response = await axios.get(
+              `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${apiKey}`
+            );
+            setWeather(response.data);
+            setError("");
+          } catch (err) {
+            setWeather(null);
+            setError("City not found. Please try again.");
+          }
+        };
+      
+        return (
+          <div style={styles.container}>
+            <h1>Weather App</h1>
+            <input
+              type="text"
+              placeholder="Enter city name"
+              value={city}
+              onChange={(e) => setCity(e.target.value)}
+              style={styles.input}
+            />
+            <button onClick={getWeather} style={styles.button}>Get Weather</button>
+      
+            {error && <p style={{ color: "red" }}>{error}</p>}
+      
+            {weather && (
+              <div style={styles.card}>
+                <h2>{weather.name}, {weather.sys.country}</h2>
+                <p><strong>Temperature:</strong> {weather.main.temp}°C</p>
+                <p><strong>Humidity:</strong> {weather.main.humidity}%</p>
+                <p><strong>Condition:</strong> {weather.weather[0].description}</p>
+              </div>
+            )}
+          </div>
+        );
+      }
+      
+      const styles = {
+        container: {
+          textAlign: "center",
+          fontFamily: "Arial, sans-serif",
+          marginTop: "50px",
+        },
+        input: {
+          padding: "10px",
+          width: "200px",
+          borderRadius: "5px",
+          border: "1px solid #ccc",
+          marginRight: "10px",
+        },
+        button: {
+          padding: "10px 15px",
+          border: "none",
+          borderRadius: "5px",
+          backgroundColor: "#4CAF50",
+          color: "white",
+          cursor: "pointer",
+        },
+        card: {
+          marginTop: "20px",
+          padding: "20px",
+          display: "inline-block",
+          border: "1px solid #ccc",
+          borderRadius: "10px",
+          backgroundColor: "#f9f9f9",
+          textAlign: "center",
+        }
+      };
+
+      export default App;
+
+RESULT:
+
+      Thus a weather application that displays the weather forecast for a specific location created successfully.
