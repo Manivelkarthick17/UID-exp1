@@ -1,0 +1,158 @@
+import React, { useState } from 'react';
+
+function Calculator() {
+  const [display, setDisplay] = useState('0');
+  const [previousValue, setPreviousValue] = useState(null);
+  const [operator, setOperator] = useState(null);
+  const [overwrite, setOverwrite] = useState(false);
+
+  function inputDigit(d) {
+    setDisplay((prev) => {
+      if (overwrite) {
+        setOverwrite(false);
+        return d;
+      }
+      if (prev === '0') return d;
+      if (prev.length >= 16) return prev;
+      return prev + d;
+    });
+  }
+
+  function inputDot() {
+    setDisplay((prev) => {
+      if (overwrite) {
+        setOverwrite(false);
+        return '0.';
+      }
+      if (prev.includes('.')) return prev;
+      return prev + '.';
+    });
+  }
+
+  function clearAll() {
+    setDisplay('0');
+    setPreviousValue(null);
+    setOperator(null);
+    setOverwrite(false);
+  }
+
+  function setOp(nextOp) {
+    if (operator && !overwrite) {
+      // chain calculation
+      const result = compute();
+      setDisplay(result);
+      setPreviousValue(result);
+    } else {
+      setPreviousValue(display);
+    }
+    setOperator(nextOp);
+    setOverwrite(true);
+  }
+
+  function computeEquals() {
+    if (!operator || previousValue == null) return;
+    const result = compute();
+    setDisplay(result);
+    setPreviousValue(null);
+    setOperator(null);
+    setOverwrite(true);
+  }
+
+  function compute() {
+    const a = parseFloat(previousValue);
+    const b = parseFloat(display);
+    if (Number.isNaN(a) || Number.isNaN(b)) return display;
+    let res = 0;
+    switch (operator) {
+      case '+':
+        res = a + b; break;
+      case '-':
+        res = a - b; break;
+      case '×':
+        res = a * b; break;
+      case '÷':
+        if (b === 0) return 'Error';
+        res = a / b; break;
+      default:
+        return display;
+    }
+    const str = String(res);
+    return str.length > 16 ? String(parseFloat(res.toFixed(10))) : str;
+  }
+
+  function negate() {
+    setDisplay((prev) => (prev.startsWith('-') ? prev.slice(1) : prev === '0' ? prev : '-' + prev));
+  }
+
+  function percent() {
+    setDisplay((prev) => String(parseFloat(prev) / 100));
+  }
+
+  const btn = {
+    padding: 12,
+    border: '1px solid #e5e7eb',
+    borderRadius: 8,
+    background: '#ffffff',
+    color: '#111827',
+    cursor: 'pointer'
+  };
+
+  const opBtn = { ...btn, background: '#111827', color: '#fff' };
+
+  return (
+    <div style={{ display: 'grid', justifyItems: 'center' }}>
+      <h2>Calculator</h2>
+      <div style={{
+        width: 320,
+        border: '1px solid #e5e7eb',
+        borderRadius: 12,
+        padding: 12,
+        boxShadow: '0 8px 24px rgba(0,0,0,0.06)',
+        background: '#f8fafc'
+      }}>
+        <div style={{
+          height: 56,
+          marginBottom: 10,
+          background: '#ffffff',
+          border: '1px solid #e5e7eb',
+          borderRadius: 8,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'flex-end',
+          padding: '0 12px',
+          fontSize: 24,
+          fontWeight: 700
+        }}>{display}</div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8 }}>
+          <button style={btn} onClick={clearAll}>AC</button>
+          <button style={btn} onClick={negate}>+/−</button>
+          <button style={btn} onClick={percent}>%</button>
+          <button style={opBtn} onClick={() => setOp('÷')}>÷</button>
+
+          <button style={btn} onClick={() => inputDigit('7')}>7</button>
+          <button style={btn} onClick={() => inputDigit('8')}>8</button>
+          <button style={btn} onClick={() => inputDigit('9')}>9</button>
+          <button style={opBtn} onClick={() => setOp('×')}>×</button>
+
+          <button style={btn} onClick={() => inputDigit('4')}>4</button>
+          <button style={btn} onClick={() => inputDigit('5')}>5</button>
+          <button style={btn} onClick={() => inputDigit('6')}>6</button>
+          <button style={opBtn} onClick={() => setOp('-')}>-</button>
+
+          <button style={btn} onClick={() => inputDigit('1')}>1</button>
+          <button style={btn} onClick={() => inputDigit('2')}>2</button>
+          <button style={btn} onClick={() => inputDigit('3')}>3</button>
+          <button style={opBtn} onClick={() => setOp('+')}>+</button>
+
+          <button style={{ ...btn, gridColumn: 'span 2' }} onClick={() => inputDigit('0')}>0</button>
+          <button style={btn} onClick={inputDot}>.</button>
+          <button style={opBtn} onClick={computeEquals}>=</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default Calculator;
+
+
